@@ -3,38 +3,66 @@ import javafx.scene.control.ToggleGroup
 import tornadofx.*
 
 class MainView: View() {
-    private val relations = (0..511).map { Relation(it) }.asObservable()
+    private val relations = (0..511).map { Relation(it) }
+//    private val shownRelations = relations.filtered {
+//        !(reflexiveFilter == FilterEnum.Yes && !it.isReflexive()) &&
+//                !(reflexiveFilter == FilterEnum.No && it.isReflexive()) &&
+//                !(symmetricFilter == FilterEnum.Yes && !it.isSymmetric()) &&
+//                !(symmetricFilter == FilterEnum.No && it.isSymmetric()) &&
+//                !(transitiveFilter == FilterEnum.Yes && !it.isTransitive()) &&
+//                !(transitiveFilter == FilterEnum.No && it.isTransitive())
+//    }
 
     private val groupReflexive = ToggleGroup()
     private val groupSymmetric = ToggleGroup()
     private val groupTransitive = ToggleGroup()
+
+    private var reflexiveFilter = FilterEnum.Either
+    private var symmetricFilter = FilterEnum.Either
+    private var transitiveFilter = FilterEnum.Either
 
     private val totalLabel = label()
 
     override val root = borderpane {
         top = hbox {
             label("Reflexive")
-            radiobutton("yes", groupReflexive)
-            radiobutton("no", groupReflexive)
+            radiobutton("yes", groupReflexive) {
+                action { reflexiveFilter = FilterEnum.Yes }
+            }
+            radiobutton("no", groupReflexive) {
+                action { reflexiveFilter = FilterEnum.No }
+            }
             radiobutton("either", groupReflexive) {
                 isSelected = true
+                action { reflexiveFilter = FilterEnum.Either }
             }
 
             label("Symmetric")
-            radiobutton("yes", groupSymmetric)
-            radiobutton("no", groupSymmetric)
+            radiobutton("yes", groupSymmetric) {
+                action { symmetricFilter = FilterEnum.Yes }
+            }
+            radiobutton("no", groupSymmetric) {
+                action { symmetricFilter = FilterEnum.No }
+            }
             radiobutton("either", groupSymmetric) {
                 isSelected = true
+                action { symmetricFilter = FilterEnum.Either }
             }
 
             label("Transitive")
-            radiobutton("yes", groupTransitive)
-            radiobutton("no", groupTransitive)
+            radiobutton("yes", groupTransitive) {
+                action { transitiveFilter = FilterEnum.Yes }
+            }
+            radiobutton("no", groupTransitive) {
+                action { transitiveFilter = FilterEnum.No }
+            }
             radiobutton("either", groupTransitive) {
                 isSelected = true
+                action { transitiveFilter = FilterEnum.Either }
             }
         }
         center = flowpane {
+            children.addAll(relations)
         }
         bottom = hbox {
             label("Total : ")
