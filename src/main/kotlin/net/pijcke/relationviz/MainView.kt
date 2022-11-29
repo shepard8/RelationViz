@@ -4,14 +4,6 @@ import tornadofx.*
 
 class MainView: View() {
     private val relations = (0..511).map { Relation(it) }
-//    private val shownRelations = relations.filtered {
-//        !(reflexiveFilter == FilterEnum.Yes && !it.isReflexive()) &&
-//                !(reflexiveFilter == FilterEnum.No && it.isReflexive()) &&
-//                !(symmetricFilter == FilterEnum.Yes && !it.isSymmetric()) &&
-//                !(symmetricFilter == FilterEnum.No && it.isSymmetric()) &&
-//                !(transitiveFilter == FilterEnum.Yes && !it.isTransitive()) &&
-//                !(transitiveFilter == FilterEnum.No && it.isTransitive())
-//    }
 
     private val groupReflexive = ToggleGroup()
     private val groupSymmetric = ToggleGroup()
@@ -59,6 +51,12 @@ class MainView: View() {
             radiobutton("either", groupTransitive) {
                 isSelected = true
                 action { transitiveFilter = FilterEnum.Either }
+            }
+
+            button("Apply filters") {
+                action {
+                    relations.forEach { it.showHide(reflexiveFilter, symmetricFilter, transitiveFilter) }
+                }
             }
         }
         center = flowpane {
