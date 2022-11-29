@@ -1,4 +1,5 @@
 package net.pijcke.relationviz
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.control.ToggleGroup
 import tornadofx.*
 
@@ -14,6 +15,8 @@ class MainView: View() {
     private var transitiveFilter = FilterEnum.Either
 
     private val totalLabel = label()
+
+    private val itemsShownCount = SimpleIntegerProperty(512)
 
     override val root = borderpane {
         top = hbox {
@@ -55,7 +58,7 @@ class MainView: View() {
 
             button("Apply filters") {
                 action {
-                    relations.forEach { it.showHide(reflexiveFilter, symmetricFilter, transitiveFilter) }
+                    itemsShownCount.set(relations.count { it.showHide(reflexiveFilter, symmetricFilter, transitiveFilter) })
                 }
             }
         }
@@ -64,7 +67,7 @@ class MainView: View() {
         }
         bottom = hbox {
             label("Total : ")
-            totalLabel
+            label(itemsShownCount)
             button("Copy LaTeX to clipboard")
         }
     }
