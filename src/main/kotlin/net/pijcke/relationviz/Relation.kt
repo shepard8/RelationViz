@@ -2,6 +2,7 @@ package net.pijcke.relationviz
 
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
+import net.pijcke.relationviz.filters.BooleanFilter
 
 class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 * pixelSide + 2.0, 3 * pixelSide + 2.0) {
 
@@ -19,33 +20,7 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
         throw NotImplementedError()
     }
 
-    fun isReflexive(): Boolean {
-        return r(0, 0) && r(1, 1) && r(2, 2)
-    }
-
-    fun isSymmetric(): Boolean {
-        return r(0, 1) == r(1, 0) &&
-                r(0, 2) == r(2, 0) &&
-                r(1, 2) == r(2, 1)
-    }
-
-    fun isTransitive(): Boolean {
-        for (a in 0..2) {
-            for (b in 0..2) {
-                if (r(a, b)) {
-                    for (c in 0..2) {
-                        if (r(b, c) && !r(a, c)) {
-                            return false
-                        }
-                    }
-                }
-            }
-        }
-
-        return true
-    }
-
-    private fun r(left: Int, right: Int): Boolean {
+    fun r(left: Int, right: Int): Boolean {
         assert(left in 0..2)
         assert(right in 0..2)
 
@@ -53,13 +28,12 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
         return (id shr bit) % 2 == 1
     }
 
-    fun showHide(reflexive: FilterEnum, symmetric: FilterEnum, transitive: FilterEnum): Boolean {
-        val show = !(reflexive == FilterEnum.Yes && !isReflexive()) &&
-                !(reflexive == FilterEnum.No && isReflexive()) &&
-                !(symmetric == FilterEnum.Yes && !isSymmetric()) &&
-                !(symmetric == FilterEnum.No && isSymmetric()) &&
-                !(transitive == FilterEnum.Yes && !isTransitive()) &&
-                !(transitive == FilterEnum.No && isTransitive())
+    fun showHide(filters: List<BooleanFilter>): Boolean {
+        val show = filters.all {
+            (it.getState() == FilterEnum.Yes && it.apply(this)) ||
+                    (it.getState() == FilterEnum.No && !it.apply(this) ||
+                            it.getState() == FilterEnum.Either)
+        }
 
         color = if (show) Color.BLACK else Color.LIGHTGRAY
 
@@ -68,7 +42,7 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
         return show
     }
 
-    fun paint() {
+    private fun paint() {
         val gc = graphicsContext2D
 
         graphicsContext2D.clearRect(0.0, 0.0, 3 * pixelSide.toDouble() + 2, 3 * pixelSide.toDouble() + 2)
