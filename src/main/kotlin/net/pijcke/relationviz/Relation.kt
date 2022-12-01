@@ -1,6 +1,7 @@
 package net.pijcke.relationviz
 
 import javafx.scene.canvas.Canvas
+import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
 import net.pijcke.relationviz.filters.BooleanFilter
 
@@ -9,15 +10,29 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
     private var color = Color.BLACK
 
     init {
+        init()
+    }
+
+    private fun init() {
         paint()
+
+        val tooltip = Tooltip(asText())
+        Tooltip.install(this, tooltip)
     }
 
     fun asLatex(): String {
         throw NotImplementedError()
     }
 
-    fun asText(): String {
-        throw NotImplementedError()
+    private fun asText(): String {
+        val parts = (0..2).flatMap { left -> (0..2).filter { right -> r(left, right) }.map { right -> asText(left, right) } }
+        return parts.joinToString(", ", "{", "}")
+    }
+
+    private fun asText(left: Int, right: Int): String {
+        val leftLetter = "abc"[left]
+        val rightLetter = "abc"[right]
+        return "R($leftLetter, $rightLetter)"
     }
 
     fun r(left: Int, right: Int): Boolean {
@@ -51,10 +66,10 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
         gc.strokeRect(1.0, 1.0, 3.0 * pixelSide, 3.0 * pixelSide)
 
         gc.fill = color
-        for (a in 0..2) {
-            for (b in 0..2) {
-                if (r(a, b)) {
-                    gc.fillRect(a * pixelSide + 1.0, b * pixelSide + 1.0, pixelSide.toDouble(), pixelSide.toDouble())
+        for (left in 0..2) {
+            for (right in 0..2) {
+                if (r(left, right)) {
+                    gc.fillRect(right * pixelSide + 1.0, left * pixelSide + 1.0, pixelSide.toDouble(), pixelSide.toDouble())
                 }
             }
         }
