@@ -10,4 +10,17 @@ The UI allows to select only the relations that are reflexive or not, only the r
 
 Finally, there is an "Export as LaTeX" button which produces a LaTeX fragment displaying the selected relations. In order for these to show correctly, the following LaTeX preamble must be present:
 
-[TODO]
+```latex
+\usepackage{tikz}
+
+\tikzset{rel/.pic={
+  \begin{scope}[scale=0.1]
+    \foreach \left in {0,1,2} {
+      \foreach \right in {0,1,2} {
+        \pgfmathsetmacro{\colour}{(mod(div(#1, pow(2, (3 * \right + \left))), 2)) ? "black" : "none"}
+        \draw[fill=\colour] (\left,\right) rectangle ++ (1,1);
+      }
+    }
+  \end{scope}
+}}
+```
