@@ -7,7 +7,9 @@ import net.pijcke.relationviz.filters.BooleanFilter
 
 class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 * pixelSide + 2.0, 3 * pixelSide + 2.0) {
 
-    private var color = Color.BLACK
+    private var shown = true
+
+    fun isShown() = shown
 
     init {
         init()
@@ -21,7 +23,7 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
     }
 
     fun asLatex(): String {
-        throw NotImplementedError()
+        return "\\tikz \\pic { rel=$id };"
     }
 
     private fun asText(): String {
@@ -44,17 +46,15 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
     }
 
     fun showHide(filters: List<BooleanFilter>): Boolean {
-        val show = filters.all {
+        shown = filters.all {
             (it.getState() == FilterEnum.Yes && it.apply(this)) ||
                     (it.getState() == FilterEnum.No && !it.apply(this) ||
                             it.getState() == FilterEnum.Either)
         }
 
-        color = if (show) Color.BLACK else Color.LIGHTGRAY
-
         paint()
 
-        return show
+        return shown
     }
 
     private fun paint() {
@@ -65,7 +65,7 @@ class Relation(private val id: Int, private val pixelSide: Int = 13): Canvas(3 *
         gc.stroke = Color.BLACK
         gc.strokeRect(1.0, 1.0, 3.0 * pixelSide, 3.0 * pixelSide)
 
-        gc.fill = color
+        gc.fill = if (shown) Color.BLACK else Color.LIGHTGRAY
         for (left in 0..2) {
             for (right in 0..2) {
                 if (r(left, right)) {

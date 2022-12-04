@@ -1,5 +1,7 @@
 package net.pijcke.relationviz
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.scene.input.Clipboard
+import javafx.scene.input.ClipboardContent
 import javafx.scene.layout.HBox
 import net.pijcke.relationviz.filters.IsReflexive
 import net.pijcke.relationviz.filters.IsSymmetric
@@ -36,7 +38,12 @@ class MainView: View() {
         bottom = hbox {
             label("Total : ")
             label(itemsShownCount)
-            button("Copy LaTeX to clipboard")
+            button("Copy LaTeX to clipboard") {
+                action {
+                    val latex = relations.filter { it.isShown() }.joinToString("\n") { it.asLatex() }
+                    Clipboard.getSystemClipboard().setContent(ClipboardContent().also { it.putString(latex) })
+                }
+            }
         }
     }
 }
